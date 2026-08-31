@@ -1,0 +1,33 @@
+{
+  "name": "@patchflow/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PatchFlow 控制面 API：Fastify 5，提供健康检查与版本信息",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsup",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@patchflow/contracts": "workspace:*",
+    "@patchflow/db": "workspace:*",
+    "@patchflow/observability": "workspace:*",
+    "fastify": "catalog:",
+    "ioredis": "catalog:",
+    "pg": "catalog:",
+    "pino": "catalog:",
+    "pino-pretty": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/pg": "catalog:",
+    "tsx": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
