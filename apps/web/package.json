@@ -1,0 +1,25 @@
+{
+  "name": "@patchflow/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PatchFlow Web 前端：Next.js 16 + React 19，Foundation 阶段为环境状态页",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "next": "16.3.3",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.5",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
