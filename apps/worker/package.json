@@ -1,0 +1,31 @@
+{
+  "name": "@patchflow/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PatchFlow Worker：BullMQ 消费者，Foundation 阶段仅校验任务并输出结构化日志",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsup",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "tsx scripts/worker-smoke.ts"
+  },
+  "dependencies": {
+    "@patchflow/contracts": "workspace:*",
+    "@patchflow/observability": "workspace:*",
+    "bullmq": "catalog:",
+    "ioredis": "catalog:",
+    "pino": "catalog:",
+    "pino-pretty": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "tsx": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
