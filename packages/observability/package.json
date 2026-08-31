@@ -1,0 +1,25 @@
+{
+  "name": "@patchflow/observability",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PatchFlow 可观测性：统一 Pino Logger 工厂与脱敏规则",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@patchflow/contracts": "workspace:*",
+    "pino": "catalog:",
+    "pino-pretty": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
