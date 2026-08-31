@@ -1,0 +1,23 @@
+{
+  "name": "@patchflow/evals",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PatchFlow 评测系统：固定 Case、隐藏验收测试、重复运行与指标计算（Foundation 阶段仅定义契约）",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@patchflow/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

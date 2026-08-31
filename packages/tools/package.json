@@ -1,0 +1,20 @@
+{
+  "name": "@patchflow/tools",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PatchFlow 受控工具集：搜索、读取、编辑、测试与 Diff 工具的契约（Foundation 阶段不实现执行）",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

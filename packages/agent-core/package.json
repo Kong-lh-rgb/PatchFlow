@@ -1,0 +1,23 @@
+{
+  "name": "@patchflow/agent-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PatchFlow Agent 核心：状态机、上下文构建、预算与模型循环（Foundation 阶段仅定义契约）",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@patchflow/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

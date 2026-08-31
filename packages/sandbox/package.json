@@ -1,0 +1,20 @@
+{
+  "name": "@patchflow/sandbox",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PatchFlow 沙箱：Git Worktree 创建、Docker 容器隔离与命令策略（Foundation 阶段仅定义限制契约）",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
