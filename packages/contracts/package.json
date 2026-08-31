@@ -1,0 +1,23 @@
+{
+  "name": "@patchflow/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PatchFlow 共享契约：Run 状态机、事件与输入的 Zod Schema，供 API、Worker、Web 与测试共同使用",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
