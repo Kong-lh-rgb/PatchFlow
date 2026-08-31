@@ -1,0 +1,55 @@
+# PatchFlow 本地依赖：PostgreSQL + Redis
+#
+# 仅用于本地开发：默认密码为弱密码、端口绑定宿主机。
+# 生产环境必须使用强密码、专用网络，且不要把端口暴露到公网。
+#
+# 注意：本仓库默认宿主端口为 5433/6380（而非 5432/6379），
+# 因为开发机往往已运行本地 PostgreSQL/Redis，避免端口冲突。
+# 所有端口、账号与库名都可通过 .env 覆盖（见 .env.example）。
+
+name: patchflow
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: patchflow-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-patchflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-patchflow}
+      POSTGRES_DB: ${POSTGRES_DB:-patchflow}
+    ports:
+      - '${POSTGRES_PORT:-5433}:5432'
+    volumes:
+      # PG 18 镜像要求挂载 /var/lib/postgresql（而非 /var/lib/postgresql/data），
+      # 以便未来 pg_upgrade --link 跨版本升级。
+      - patchflow_pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-patchflow} -d ${POSTGRES_DB:-patchflow}']
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
+    restart: unless-stopped
+
+  redis:
+    image: redis:8-alpine
+    container_name: patchflow-redis
+    # 关闭危险命令，降低本地误操作影响（appendonly 保留队列可恢复性）。
+    command: ['redis-server', '--appendonly', 'yes', '--rename-command', 'FLUSHALL', '']
+    ports:
+      - '${REDIS_PORT:-6380}:6379'
+    volumes:
+      - patchflow_redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 3s
+    restart: unless-stopped
+
+volumes:
+  patchflow_pgdata:
+    name: patchflow_pgdata
+  patchflow_redisdata:
+    name: patchflow_redisdata
