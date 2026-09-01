@@ -10,12 +10,14 @@
 - `@patchflow/contracts`：Run 状态机 / 阶段 / 事件 / 输入的 Zod 契约与环境变量校验。
 - `@patchflow/db`：Drizzle Schema（`runs`、`run_events`）+ 第一份 migration + 惰性客户端。
 - `@patchflow/observability`：统一 Pino Logger 工厂（级别可控、开发可读 / 生产 JSON、凭据脱敏）。
+- `@patchflow/tools`：带路径防护和有界输出的 `list_files`、`read_file`、`search_code` 只读工具。
+- `@patchflow/sandbox`：受管 Git Worktree 的创建、归属检查、脏状态检查和安全清理。
 - `apps/api`：Fastify 5，`GET /health`（进程存活）、`GET /ready`（探测 PostgreSQL + Redis，失败返回 503 结构化错误）、`GET /api/version`。
 - `apps/worker`：BullMQ `run.execute` 任务 Schema、队列封装、校验型消费者（仅结构化日志，不执行 Agent）、SIGTERM/SIGINT 优雅关闭。
 - `apps/web`：Next.js 16 + React 19 的 Foundation 状态页（API 实时探测 + PostgreSQL/Redis/Worker 占位卡；API 不可用时显示错误横幅而非白屏）。
 - Docker Compose：本地 PostgreSQL 18 + Redis 8（命名 Volume、healthcheck、端口账号可覆盖）。
 
-**尚未实现**（不要指望它们现在能用）：Agent 执行状态机、模型调用、Git Worktree / Docker 沙箱、工具执行、SSE 实时进度、审批、恢复、评测系统。
+**尚未实现**（不要指望它们现在能用）：Agent 执行状态机、模型调用、Docker 命令沙箱、写入/测试/Diff 工具、SSE 实时进度、审批、恢复、评测系统。
 
 ## 技术栈
 
@@ -134,8 +136,8 @@ patchflow/
 │   ├── db/                  # Drizzle Schema、migration、客户端工厂
 │   ├── agent-core/          # 状态机转换表与阶段工具策略（契约，未实现执行）
 │   ├── model-providers/     # 模型 Provider 统一接口（契约，未接入 SDK）
-│   ├── tools/               # 受控工具接口与输出上限（契约，未实现执行）
-│   ├── sandbox/             # 沙箱限制与命令 Allowlist（契约，未实现容器）
+│   ├── tools/               # PathGuard + 只读工具（写入/测试/Diff 待实现）
+│   ├── sandbox/             # Git Worktree 生命周期 + 沙箱限制（Docker 待实现）
 │   ├── observability/       # Pino Logger 工厂 + 脱敏规则
 │   └── evals/               # 评测指标口径与 Case 契约（未建数据集）
 ├── docs/
@@ -154,7 +156,7 @@ patchflow/
 
 - Agent 执行（分析/复现/计划/编辑/验证的完整状态机驱动）。
 - 模型调用（Anthropic/OpenAI Provider 只定义了接口）。
-- Git Worktree、Docker 命令沙箱、命令 Allowlist 执行。
+- Docker 命令沙箱与命令 Allowlist 执行（Git Worktree 生命周期已实现）。
 - SSE 实时进度、审批流、断点恢复、Run 租约与幂等重试。
 - 评测数据集与指标报告。
 
@@ -164,7 +166,8 @@ patchflow/
 
 按项目说明的路线图，下一阶段最有价值的增量是：
 
-1. **最小 CLI 闭环**：导入一个本地 Git 仓库 → 创建 Worktree → 执行 `read_file`/`search_code`/`apply_patch` 三个受控工具 → 产出可查看的 Diff（不接模型，先用脚本驱动，验证工具与隔离边界）。
-2. 随后接入 model-providers 与 agent-core 状态机，形成"分析 → 编辑 → 验证"循环。
+1. 实现受控 `apply_patch` 与 `git_diff`，和已有 Worktree、只读工具组成不接模型的最小代码修改闭环。
+2. 增加 CLI 冒烟脚本：创建 Worktree → 读取/搜索 → 应用 Patch → 输出 Diff → 保存结果后清理。
+3. 随后接入 model-providers 与 agent-core 状态机，形成"分析 → 编辑 → 验证"循环。
 
 进度与决策记录见 [docs/progress/](docs/progress/)。

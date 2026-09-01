@@ -3,7 +3,7 @@
  *
  * 隔离执行层。职责：为每个 Run 创建独立 Git Worktree、在受限 Docker
  * 容器中执行命令、实施资源与命令 Allowlist 策略。
- * Foundation 阶段只固化默认限制契约，容器执行后续阶段实现。
+ * 已实现受管 Git Worktree 生命周期；Docker 容器执行后续阶段实现。
  */
 
 /** 沙箱默认限制（见项目说明 9；默认拒绝网络与非 root）。 */
@@ -63,3 +63,21 @@ export function checkCommandPolicy(
 ): boolean {
   return policy.allowedPrograms.includes(program);
 }
+
+export {
+  createWorktree,
+  inspectWorktree,
+  removeWorktree,
+  DEFAULT_WORKTREE_BASE_DIR,
+  WorktreeError,
+} from './worktree.js';
+export type {
+  CreatedWorktree,
+  CreateWorktreeInput,
+  RemovedWorktree,
+  RemoveWorktreeInput,
+  WorktreeErrorCode,
+  WorktreeIdentity,
+  WorktreeInspection,
+  WorktreeManagerOptions,
+} from './worktree.js';

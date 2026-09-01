@@ -80,10 +80,14 @@ PatchFlow 的核心价值在于**对执行边界、状态转换、恢复语义�
 
 Worker 的处理函数是纯函数（`processRunExecuteJob(data, logger)`），非法数据抛 `InvalidJobDataError` 由 BullMQ 标记 failed；模块导入零副作用（连接与消费只在入口显式启动）；SIGTERM/SIGINT 先停消费再关连接。
 
+### 5.6 Git Worktree 生命周期
+
+`packages/sandbox` 已实现受管 Worktree 的创建、检查与删除：每个 Run 从固定 Commit 创建 detached Worktree，不自动创建分支；系统校验 Worktree 与原仓库共享同一个 Git common directory，并记录 HEAD 与脏状态。普通删除遇到未提交修改时拒绝，只有保存 Patch 后显式 `force` 才能清理。Git 命令全部通过 `spawn(program, args[])` 执行，不经过 Shell；Run ID 和受管根目录都经过约束，错误配置不能在用户仓库内创建工作目录。
+
 ## 6. 已确定、待实现的决策
 
 - **状态转换必须在统一函数 + 数据库事务中完成**（转换表已在 agent-core，事务包装未实现）。
 - **Worker 租约**：`lease_owner`/`lease_expires_at` + `version` 乐观锁，防止两 Worker 同时执行同一 Run。
-- **沙箱**：每 Run 一个 Git Worktree + 受限 Docker 容器（默认断网、非 root、只读根 FS、命令 Allowlist、超时与资源上限）；默认限制已固化为 `DEFAULT_SANDBOX_LIMITS` 常量。
-- **工具层**：7 个受控工具，无任意 Shell；命令以 `{ program, args[] }` 交给 spawn。
+- **Docker 沙箱**：Git Worktree 生命周期已实现；下一步把 Worktree 挂载进受限容器（默认断网、非 root、只读根 FS、命令 Allowlist、超时与资源上限）。默认限制已固化为 `DEFAULT_SANDBOX_LIMITS` 常量。
+- **工具层**：`list_files`、`read_file`、`search_code` 已实现；`apply_patch`、`run_tests`、`run_typecheck`、`git_diff` 待实现。所有命令使用参数数组交给 spawn，无任意 Shell。
 - **评测**：固定 Case + 隐藏验收测试 + 连续 3 次稳定通过口径（`computeStablePassRate` 已实现）。
