@@ -323,6 +323,10 @@ importers:
         version: 4.1.11(@types/node@24.13.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(tsx@4.23.13))
 
   packages/tools:
+    dependencies:
+      zod:
+        specifier: 'catalog:'
+        version: 4.5.4
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
