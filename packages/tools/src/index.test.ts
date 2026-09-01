@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { CONTROLLED_TOOL_NAMES, TOOL_OUTPUT_LIMITS, isControlledToolName } from './index.js';
+import {
+  CONTROLLED_TOOL_NAMES,
+  createListFilesTool,
+  createReadFileTool,
+  createSearchCodeTool,
+  isControlledToolName,
+  TOOL_OUTPUT_LIMITS,
+} from './index.js';
 
 describe('CONTROLLED_TOOL_NAMES', () => {
   it('恰好包含 7 个受控工具', () => {
@@ -30,5 +37,15 @@ describe('TOOL_OUTPUT_LIMITS', () => {
     expect(TOOL_OUTPUT_LIMITS.maxSearchResults).toBeGreaterThan(0);
     expect(TOOL_OUTPUT_LIMITS.maxResultChars).toBeGreaterThan(0);
     expect(TOOL_OUTPUT_LIMITS.maxReadLines).toBeGreaterThan(0);
+  });
+});
+
+describe('已实现的工具工厂', () => {
+  it('三个只读工具都是受控工具', () => {
+    for (const tool of [createListFilesTool(), createReadFileTool(), createSearchCodeTool()]) {
+      expect(isControlledToolName(tool.name)).toBe(true);
+      expect(tool.description.length).toBeGreaterThan(0);
+      expect(typeof tool.execute).toBe('function');
+    }
   });
 });
