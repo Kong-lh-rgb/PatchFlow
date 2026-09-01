@@ -15,6 +15,8 @@ const context: ToolExecutionContext = {
 
 beforeAll(async () => {
   await fs.mkdir(path.join(root, 'src', 'nested'), { recursive: true });
+  await fs.mkdir(path.join(root, 'src', 'nested', 'node_modules', 'pkg'), { recursive: true });
+  await fs.mkdir(path.join(root, 'src', 'nested', 'dist'), { recursive: true });
   await fs.mkdir(path.join(root, 'node_modules', 'pkg'), { recursive: true });
   await fs.mkdir(path.join(root, 'dist'), { recursive: true });
   await fs.writeFile(
@@ -24,6 +26,11 @@ beforeAll(async () => {
   await fs.writeFile(path.join(root, 'src', 'nested', 'beta.ts'), 'function helloNested() {}\n');
   await fs.writeFile(path.join(root, 'node_modules', 'pkg', 'index.js'), 'hello in deps\n');
   await fs.writeFile(path.join(root, 'dist', 'bundle.js'), 'hello in dist\n');
+  await fs.writeFile(
+    path.join(root, 'src', 'nested', 'node_modules', 'pkg', 'index.js'),
+    'hello in nested deps\n',
+  );
+  await fs.writeFile(path.join(root, 'src', 'nested', 'dist', 'bundle.js'), 'hello nested dist\n');
   await fs.writeFile(path.join(root, 'src', 'dots.ts'), 'axb\nfoo a.b bar\n');
 });
 
@@ -71,7 +78,8 @@ describe('searchCode', () => {
   it('限定 path 只搜索该目录', async () => {
     const result = await searchCode({ pattern: 'hello', path: 'src/nested' }, context);
     expect(result.ok).toBe(true);
-    expect(result.summary).toContain('beta.ts:1');
+    // 输出必须仍相对仓库根，才能直接作为 read_file 的 path 输入。
+    expect(result.summary).toContain(path.join('src', 'nested', 'beta.ts:1'));
     expect(result.summary).not.toContain('alpha.ts');
   });
 
@@ -80,6 +88,8 @@ describe('searchCode', () => {
     expect(result.summary).not.toContain('node_modules');
     expect(result.summary).not.toContain('dist');
     expect(result.summary).not.toContain('bundle.js');
+    expect(result.summary).not.toContain('nested deps');
+    expect(result.summary).not.toContain('nested dist');
   });
 
   it('无匹配时返回成功与明确说明', async () => {

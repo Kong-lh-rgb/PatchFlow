@@ -1,6 +1,5 @@
 import { spawn } from 'node:child_process';
 import fs from 'node:fs/promises';
-import path from 'node:path';
 import { z } from 'zod';
 import { createPathGuard, pathGuardFailure } from './path-guard.js';
 import { TOOL_OUTPUT_LIMITS } from './types.js';
@@ -166,19 +165,25 @@ export async function searchCode(
   const input = parsed.data;
 
   const guard = await createPathGuard(context.worktreePath);
-  let searchDir: string;
+  let searchTarget: string;
   try {
-    searchDir = await guard.resolveReal(input.path);
+    searchTarget = await guard.resolveReal(input.path);
   } catch (error) {
     return pathGuardFailure(error);
   }
-  const stat = await fs.stat(searchDir).catch(() => null);
+  const stat = await fs.stat(searchTarget).catch(() => null);
   if (stat === null) {
     return { ok: false, summary: `路径不存在：${input.path}` };
   }
-  // 目录：以该目录为 cwd 递归搜索；文件：只搜索该文件。
-  const rgCwd = stat.isDirectory() ? searchDir : path.dirname(searchDir);
-  const rgPathArg = stat.isDirectory() ? [] : [path.basename(searchDir)];
+  if (!stat.isDirectory() && !stat.isFile()) {
+    return { ok: false, summary: `既不是文件也不是目录：${input.path}` };
+  }
+
+  // 始终以仓库真实根为 cwd，使搜索结果可以直接作为 read_file 的仓库相对路径。
+  // 搜索根目录时不传路径参数，避免 rg 输出带多余的 "./" 前缀。
+  const rgCwd = guard.realRoot;
+  const relativeTarget = guard.toRelative(searchTarget);
+  const rgPathArg = relativeTarget === '.' ? [] : [relativeTarget];
 
   const args: string[] = ['-n', '--no-heading', '--no-messages', '--color', 'never'];
   if (!input.caseSensitive) {
@@ -188,11 +193,12 @@ export async function searchCode(
     args.push('-F');
   }
   // 即使目标仓库没有 .gitignore 也保证跳过依赖与构建产物。
-  args.push('--glob', '!node_modules/**', '--glob', '!dist/**', '--glob', '!.git/**');
-  // 搜索单个文件时 rg 会省略文件名前缀，强制带上有助于稳定解析。
-  if (!stat.isDirectory()) {
-    args.push('--with-filename');
+  for (const ignoredDir of ['node_modules', 'dist', '.git']) {
+    // 同时覆盖仓库根和任意嵌套层级的同名目录。
+    args.push('--glob', `!${ignoredDir}/**`, '--glob', `!**/${ignoredDir}/**`);
   }
+  // 搜索单个文件时 rg 默认省略文件名前缀，始终强制输出以稳定解析。
+  args.push('--with-filename');
   // '--' 之后是字面量 pattern 与路径，防止以 '-' 开头被当作选项。
   args.push('--', input.pattern, ...rgPathArg);
 
