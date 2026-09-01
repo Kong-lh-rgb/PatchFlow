@@ -129,11 +129,9 @@ describe('resolveReal（符号链接校验）', () => {
     expect(guard.toRelative(real)).toBe(path.join('src', 'not-created-yet.ts'));
   });
 
-  it('根目录本身返回真实根（macOS /tmp → /private/tmp）', async () => {
+  it('根目录本身返回操作系统解析后的真实根', async () => {
     const guard = await createPathGuard(root);
     expect(await guard.resolveReal('.')).toBe(guard.realRoot);
-    expect(guard.realRoot.startsWith(os.tmpdir().replace('/tmp', '/private/tmp'))).toBe(
-      guard.realRoot.includes('/private/tmp') || guard.realRoot.includes('/tmp'),
-    );
+    expect(guard.realRoot).toBe(await fs.realpath(root));
   });
 });
